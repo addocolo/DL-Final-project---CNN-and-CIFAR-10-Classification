@@ -49,6 +49,8 @@ As expected the model performed much better than random chance, but still left a
 
 <img width="523" height="374" alt="image" src="https://github.com/user-attachments/assets/e649ba3f-4a5e-4ce7-af5b-0171ba5d8ba2" />
 
+<img width="584" height="477" alt="f7c90dcd-36b7-4609-a06b-784d511319a8" src="https://github.com/user-attachments/assets/76846784-5ef9-4984-996e-d886ffa509a5" />
+
 <img width="990" height="590" alt="aa6fb52c-fb36-4dd4-ab42-1725b971c509" src="https://github.com/user-attachments/assets/8110105e-a776-421a-8cfe-b924831de1bc" />
 
 ## Improved model
@@ -63,10 +65,56 @@ As expected the model performed much better than random chance, but still left a
 
 <img width="981" height="449" alt="3861211b-3e49-497a-9e12-42855728e91c" src="https://github.com/user-attachments/assets/bc5fca53-f6aa-4961-8dca-690846a0e6b3" />
 
-<img width="514" height="380" alt="image" src="https://github.com/user-attachments/assets/7e618af7-004c-46b7-9e17-6a43b8450b36" />
+<img width="509" height="370" alt="image" src="https://github.com/user-attachments/assets/56427ce1-3fd5-4d50-8955-a54401c39967" />
 
 <img width="584" height="477" alt="f7c90dcd-36b7-4609-a06b-784d511319a8" src="https://github.com/user-attachments/assets/a713f383-1eae-40b3-aab7-409c96f33e75" />
 
 <img width="990" height="590" alt="aa6fb52c-fb36-4dd4-ab42-1725b971c509" src="https://github.com/user-attachments/assets/b8ac0e38-6a1e-4cef-8991-9c782065a213" />
 
+## Resnet-Style model
 
+While researching for this project, the authors came across an article titled "[A Practical Comparison Between CNN and ResNet Architectures: A Focus on Attention Mechanisms
+](https://medium.com/@leonardofonseca.r/a-practical-comparison-between-cnn-and-resnet-architectures-a-focus-on-attention-mechanisms-cee7ec8eca55)" that compared a standard CNN to a ResNet like architecture for classifying cat and dog images. This inspired us to adapt their approach for our own dataset. The key architectural difference between our earlier CNN and this ResNet implementation lies in the introduction of residual blocks with skip connections. In a conventional CNN, each convolutional block processes its input and passes the transformed output directly to the next layer. In contrast, in a ResNet block the output of the convolutional path is added to the original input before applying the activation function. This “shortcut” connection allows the network to preserve information from earlier layers, reducing the risk of losing important features and mitigate the vanishing gradient problem.
+
+Each residual block ressembles our convolutional blocks from the previous model with two convolutional layers, each followed by batch normalization and dropout. The key difference is the skip path which is included after the second convolution-batch normalization pair. The dense layer mirrors our CNN exactly.
+
+<img width="502" height="1380" alt="image" src="https://github.com/user-attachments/assets/330c9869-a037-4c0d-b3f5-13a4be627a5a" />
+
+### Results
+
+<img width="981" height="449" alt="063a5e80-faeb-4e1a-844e-a517220e5108" src="https://github.com/user-attachments/assets/ef6dfb70-0d96-45f0-b52c-fe995faffa82" />
+
+<img width="509" height="374" alt="image" src="https://github.com/user-attachments/assets/43fa8f25-f540-4b88-89f6-81cc13cfae1e" />
+
+<img width="584" height="477" alt="ae6d0997-7dd3-4cae-bd7a-71a775093427" src="https://github.com/user-attachments/assets/10f7cc52-4ac3-4d8a-b68b-78b819195482" />
+
+<img width="990" height="590" alt="7f9d8ed1-862a-49d6-a8df-265d6953aa39" src="https://github.com/user-attachments/assets/52811f75-d11d-45a7-a349-354f08988e79" />
+
+# Results and Discussion
+
+Our results show that a relatively simple CNN can achieve strong performance on CIFAR-10. This highlights the effectiveness of convolutional layers in extracting visual features, even from small, low-resolution images where those features are less distinct compared to larger datasets.
+
+We also experimented with residual connections inspired by the ResNet architecture. In our case, these connections did not provide clear performance benefits, which contrasts with findings from other studies, including the article on which our ResNet-inspired model was based. However, our architecture was relatively lightweight; it is possible that larger, deeper, or more state-of-the-art networks would benefit more from residual connections. Importantly, the addition of residual connections did not harm performance in any significant way.
+
+A key limitation observed was the model’s difficulty with fine-grained distinctions between visually similar classes. For example, cats and dogs share many features and often appear against similar backgrounds, leading to higher misclassification rates between these classes. Similarly, cars and trucks were sometimes confused, as they share structural similarities and background contexts. Notably, cats were misclassified more often than any other class.
+
+To better understand these misclassifications, we examined Grad-CAM visualizations of several randomly selected cat images. Grad-CAM overlays a heatmap onto the original image, highlighting the regions that most strongly influenced the model’s decision. Warmer colors (red, orange, yellow) indicate areas of high influence, while cooler colors (blue, purple) indicate low influence. In many of the cat images, the heatmaps suggested that the model was paying more attention to the background than to the animal itself. This suggests that the CNN may be relying too heavily on contextual cues rather than focusing on the defining features of the object.
+
+Overall, these findings suggest that while our CNN is effective at learning general visual patterns in CIFAR-10, it still struggles with subtle, fine-grained distinctions and occasionally relies on background context rather than the object itself. This highlights both the strengths and limitations of our approach, setting the stage for potential improvements through more advanced architectures, more robust data augmentation, or transfer learning.
+
+<img width="359" height="1965" alt="b81b69bb-bbb4-4211-846b-57dd8771584e" src="https://github.com/user-attachments/assets/a2b2de37-d191-4e0e-9262-4d4e8750f5c9" />
+
+# Conclusions
+
+This project demonstrated that CNNs can achieve strong performance on the CIFAR-10 dataset, even with relatively simple architectures. While residual connections did not significantly improve results in our lightweight model, they remain a promising direction for deeper networks.
+
+The main challenges were in fine-grained class distinctions (e.g., cats vs. dogs) and the model’s tendency to rely on background features, as revealed by Grad-CAM visualizations. These findings suggest that while the approach is effective overall, there is room for improvement.
+
+Future work should explore more robust data augmentation, further hyperparameter tuning, and transfer learning with deeper architectures to further improve accuracy and robustness.
+
+# References
+
+CIFAR-10 Data source: https://keras.io/api/datasets/cifar10/
+
+[A Practical Comparison Between CNN and ResNet Architectures: A Focus on Attention Mechanisms
+](https://medium.com/@leonardofonseca.r/a-practical-comparison-between-cnn-and-resnet-architectures-a-focus-on-attention-mechanisms-cee7ec8eca55)
